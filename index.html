@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>TableFlow — Reserva tu Mesa Ahora</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{font-family:'Inter',sans-serif}
+body{background:#080807;color:#f0f0f0}
+.glass{background:rgba(255,255,255,0.04);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08)}
+.accent{color:#f97316}
+.accent-bg{background:linear-gradient(135deg,#f97316,#ef4444)}
+.btn-primary{background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:700;transition:all .2s;border-radius:12px;padding:14px 28px;border:none}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(249,115,22,.4)}
+.card{background:#110f0e;border:1px solid #2a1f1a;border-radius:20px;transition:all .3s}
+input,select{background:#110f0e;border:1px solid #2a1f1a;color:#f0f0f0;border-radius:10px;padding:12px 16px;width:100%;outline:none;transition:border .2s}
+input:focus,select:focus{border-color:#f97316}
+select option{background:#110f0e}
+/* Table map */
+.table-cell{width:58px;height:58px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;font-size:11px;font-weight:700;user-select:none}
+.table-free{background:#111;border:2px solid #2a2a2a;color:#555}
+.table-free:hover{border-color:#f97316;color:#f97316;background:#180e05}
+.table-occ{background:#1a0a00;border:2px solid #7c2d12;color:#c2410c;cursor:not-allowed}
+.table-sel{background:#1a0d00;border:2px solid #f97316;color:#f97316;box-shadow:0 0 15px rgba(249,115,22,.3)}
+/* Menu cards */
+.menu-cat{background:#110f0e;border:1px solid #2a1f1a;border-radius:12px;padding:6px 16px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+.menu-cat.active,.menu-cat:hover{background:rgba(249,115,22,.15);border-color:#f97316;color:#f97316}
+.dish-card{background:#110f0e;border:1px solid #1f1a17;border-radius:16px;overflow:hidden;transition:all .3s}
+.dish-card:hover{border-color:#f97316/30;transform:translateY(-3px)}
+.wait-step{padding:12px 0;border-bottom:1px solid #1f1a17;display:flex;align-items:center;gap:12px}
+.wait-step:last-child{border:none}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 accent-bg rounded-lg flex items-center justify-center font-black text-white text-sm">TF</div>
+      <span class="font-bold text-lg">TableFlow</span>
+    </div>
+    <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+      <a href="#reserva" class="hover:text-white transition">Reservar</a>
+      <a href="#mapa" class="hover:text-white transition">Mapa mesas</a>
+      <a href="#menu" class="hover:text-white transition">Carta</a>
+      <a href="#lista" class="hover:text-white transition">Lista espera</a>
+    </div>
+    <a href="#reserva" class="btn-primary text-sm py-2 px-5">Reservar ahora</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="relative min-h-[90vh] flex items-center overflow-hidden">
+  <div class="absolute inset-0">
+    <img src="img/hero.webp" class="w-full h-full object-cover opacity-30"/>
+    <div class="absolute inset-0 bg-gradient-to-r from-[#080807] via-[#080807]/85 to-transparent"></div>
+  </div>
+  <div class="relative max-w-6xl mx-auto px-6 pt-24">
+    <div class="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-sm text-orange-400 mb-6">
+      <span>🟢</span>
+      <span class="text-gray-300">Abierto · 7 mesas disponibles ahora mismo</span>
+    </div>
+    <h1 class="text-5xl md:text-7xl font-black leading-tight">Tu mesa,<br/><span class="accent">lista para ti.</span></h1>
+    <p class="text-gray-400 mt-6 text-xl max-w-xl leading-relaxed">Reserva en 30 segundos, elige tu mesa en el plano y sigue tu turno si hay espera. Gastronomía sin fricción.</p>
+    <div class="flex flex-wrap gap-4 mt-10">
+      <a href="#reserva" class="btn-primary text-base">Reservar mesa →</a>
+      <a href="#mapa" class="glass text-white font-semibold rounded-xl px-7 py-4 border border-white/10 hover:border-orange-500/30 transition text-sm">Ver mesas disponibles</a>
+    </div>
+    <div class="flex flex-wrap gap-4 mt-12">
+      <div class="glass rounded-xl px-5 py-3 text-sm"><span class="font-bold">7</span> <span class="text-gray-400">mesas libres</span></div>
+      <div class="glass rounded-xl px-5 py-3 text-sm"><span class="font-bold accent">~25 min</span> <span class="text-gray-400">próximo turno</span></div>
+      <div class="glass rounded-xl px-5 py-3 text-sm">📅 <span class="text-gray-400">Reservas hasta 30 días</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESERVA + MAPA -->
+<section id="reserva" class="max-w-6xl mx-auto px-6 py-24">
+  <div class="grid md:grid-cols-2 gap-12">
+
+    <!-- Formulario -->
+    <div class="card p-8">
+      <h2 class="text-2xl font-bold mb-2">Reservar mesa</h2>
+      <p class="text-gray-500 text-sm mb-8">Confirmación inmediata. Sin tarjeta de crédito.</p>
+
+      <div class="space-y-4" id="res-form">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-gray-500 uppercase tracking-wider mb-2 block">Fecha</label>
+            <input type="date" id="res-date"/>
+          </div>
+          <div>
+            <label class="text-xs text-gray-500 uppercase tracking-wider mb-2 block">Hora</label>
+            <select id="res-time">
+              <option>13:00</option><option>13:30</option><option>14:00</option>
+              <option>14:30</option><option>20:00</option><option>20:30</option>
+              <option>21:00</option><option>21:30</option><option>22:00</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-gray-500 uppercase tracking-wider mb-2 block">Comensales</label>
+          <div class="flex gap-2" id="party-btns">
+            <button onclick="setParty(this,1)" class="party-btn flex-1 py-3 glass rounded-xl text-sm font-bold hover:border-orange-500/30 transition">1</button>
+            <button onclick="setParty(this,2)" class="party-btn flex-1 py-3 glass rounded-xl text-sm font-bold hover:border-orange-500/30 transition" style="border-color:#f97316;color:#f97316">2</button>
+            <button onclick="setParty(this,3)" class="party-btn flex-1 py-3 glass rounded-xl text-sm font-bold hover:border-orange-500/30 transition">3</button>
+            <button onclick="setParty(this,4)" class="party-btn flex-1 py-3 glass rounded-xl text-sm font-bold hover:border-orange-500/30 transition">4</button>
+            <button onclick="setParty(this,'+4')" class="party-btn flex-1 py-3 glass rounded-xl text-sm font-bold hover:border-orange-500/30 transition">+4</button>
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-gray-500 uppercase tracking-wider mb-2 block">Zona preferida</label>
+          <select id="res-zone">
+            <option value="">Sin preferencia</option>
+            <option value="terraza">🌿 Terraza</option>
+            <option value="interior">🕯️ Interior</option>
+            <option value="barra">🍷 Barra alta</option>
+            <option value="privado">🔒 Sala privada</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <input type="text" placeholder="Nombre" id="res-name"/>
+          <input type="tel" placeholder="Teléfono" id="res-phone"/>
+        </div>
+        <input type="text" placeholder="Ocasión especial (cumpleaños, aniversario…)" id="res-note"/>
+        <button onclick="confirmRes()" class="btn-primary w-full text-center">Confirmar reserva</button>
+      </div>
+
+      <div id="res-confirm" class="hidden text-center py-6">
+        <div class="text-5xl mb-4">🍽️</div>
+        <h3 class="text-xl font-bold">¡Reserva confirmada!</h3>
+        <p class="text-gray-400 mt-2 text-sm">Recibirás confirmación por WhatsApp.</p>
+        <div class="glass rounded-xl p-5 mt-5 text-left space-y-2 text-sm">
+          <div class="flex justify-between"><span class="text-gray-500">Mesa</span><span id="c-table" class="font-bold accent"></span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Comensales</span><span id="c-party" class="font-bold"></span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Hora</span><span id="c-rtime" class="font-bold"></span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Código</span><span id="c-rcode" class="font-mono font-bold accent"></span></div>
+        </div>
+        <button onclick="resetRes()" class="btn-primary mt-5 text-sm px-8">Nueva reserva</button>
+      </div>
+    </div>
+
+    <!-- Mapa de mesas -->
+    <div id="mapa" class="card p-8">
+      <h2 class="text-2xl font-bold mb-2">Mapa de mesas</h2>
+      <p class="text-gray-500 text-sm mb-5">Toca una mesa libre para seleccionarla.</p>
+      <div class="flex gap-3 text-xs text-gray-500 mb-6">
+        <div class="flex items-center gap-1"><div class="w-3 h-3 bg-[#111] border border-[#2a2a2a] rounded"></div>Libre</div>
+        <div class="flex items-center gap-1"><div class="w-3 h-3 bg-[#1a0a00] border border-[#7c2d12] rounded"></div>Ocupada</div>
+        <div class="flex items-center gap-1"><div class="w-3 h-3 bg-[#1a0d00] border border-[#f97316] rounded"></div>Seleccionada</div>
+      </div>
+
+      <!-- Terraza -->
+      <p class="text-xs text-gray-600 uppercase tracking-wider mb-3 font-semibold">🌿 Terraza</p>
+      <div class="flex gap-3 mb-5" id="terraza-grid"></div>
+
+      <!-- Interior -->
+      <p class="text-xs text-gray-600 uppercase tracking-wider mb-3 font-semibold">🕯️ Interior</p>
+      <div class="grid grid-cols-5 gap-3 mb-5" id="interior-grid"></div>
+
+      <!-- Barra -->
+      <p class="text-xs text-gray-600 uppercase tracking-wider mb-3 font-semibold">🍷 Barra alta</p>
+      <div class="flex gap-3" id="barra-grid"></div>
+
+      <div id="table-info" class="hidden glass rounded-xl p-4 mt-5 text-sm">
+        <p class="font-semibold" id="ti-name"></p>
+        <p class="text-gray-500 text-xs mt-1" id="ti-cap"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CARTA DIGITAL -->
+<section id="menu" class="max-w-6xl mx-auto px-6 py-16">
+  <h2 class="text-3xl font-bold mb-2">Nuestra Carta</h2>
+  <p class="text-gray-500 mb-6">Ingredientes de temporada. Actualizada cada semana.</p>
+  <div class="flex gap-3 flex-wrap mb-8" id="menu-cats">
+    <button onclick="setMenuCat(this,'entrantes')" class="menu-cat active">Entrantes</button>
+    <button onclick="setMenuCat(this,'principales')" class="menu-cat">Principales</button>
+    <button onclick="setMenuCat(this,'postres')" class="menu-cat">Postres</button>
+    <button onclick="setMenuCat(this,'vinos')" class="menu-cat">Vinos</button>
+  </div>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="menu-grid"></div>
+</section>
+
+<!-- LISTA DE ESPERA -->
+<section id="lista" class="max-w-4xl mx-auto px-6 py-16">
+  <div class="card p-10">
+    <h2 class="text-3xl font-bold mb-2">Sin reserva? <span class="accent">Lista de espera</span></h2>
+    <p class="text-gray-400 mb-8">Apúntate y te avisamos por WhatsApp cuando haya mesa disponible.</p>
+    <div class="grid sm:grid-cols-3 gap-4 mb-6">
+      <input type="text" placeholder="Nombre"/>
+      <input type="tel" placeholder="WhatsApp"/>
+      <select><option>2 personas</option><option>3 personas</option><option>4 personas</option><option>5+ personas</option></select>
+    </div>
+    <button onclick="joinWaitlist(this)" class="btn-primary text-sm px-10">Apuntarme a la lista</button>
+
+    <!-- Cola simulada -->
+    <div class="mt-8">
+      <p class="text-sm text-gray-400 font-semibold mb-4">Estado de la lista ahora mismo:</p>
+      <div class="space-y-1">
+        <div class="wait-step"><div class="w-7 h-7 rounded-full bg-green-900 border border-green-700 text-green-400 flex items-center justify-center text-xs font-bold">✓</div><div><p class="text-sm font-semibold text-gray-500">Familia García (4 pax)</p><p class="text-xs text-gray-600">Avisados · Mesa 12 asignada</p></div></div>
+        <div class="wait-step"><div class="w-7 h-7 rounded-full bg-orange-900 border border-orange-700 text-orange-400 flex items-center justify-center text-xs font-bold">1</div><div><p class="text-sm font-semibold">Ana y Marcos (2 pax)</p><p class="text-xs text-gray-500">~15 min de espera</p></div></div>
+        <div class="wait-step" id="my-wait-row" style="display:none"><div class="w-7 h-7 rounded-full bg-orange-900 border border-orange-500 text-orange-400 flex items-center justify-center text-xs font-bold">2</div><div><p class="text-sm font-semibold accent">Tú (recién apuntado)</p><p class="text-xs text-gray-500">~30 min de espera</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-white/5 py-10 text-center text-gray-600 text-sm">
+  <p class="font-bold text-white mb-1">TableFlow Restaurante</p>
+  <p>Calle Gourmet 24 · Madrid · Lun–Dom 13:00–16:00 · 20:00–24:00</p>
+  <p class="mt-2">Desarrollado por <span class="accent font-semibold">PuntoZero Solutions</span></p>
+</footer>
+
+<script>
+// Tables config
+const tables = {
+  terraza: [{id:'T1',cap:2,occ:true},{id:'T2',cap:4,occ:false},{id:'T3',cap:2,occ:false},{id:'T4',cap:6,occ:true}],
+  interior: [
+    {id:'I1',cap:2,occ:false},{id:'I2',cap:2,occ:true},{id:'I3',cap:4,occ:false},{id:'I4',cap:4,occ:true},{id:'I5',cap:4,occ:false},
+    {id:'I6',cap:2,occ:true},{id:'I7',cap:6,occ:false},{id:'I8',cap:2,occ:false},{id:'I9',cap:4,occ:true},{id:'I10',cap:2,occ:false},
+  ],
+  barra: [{id:'B1',cap:2,occ:false},{id:'B2',cap:2,occ:true},{id:'B3',cap:2,occ:false}],
+};
+
+let selTable = null;
+let partySize = 2;
+
+function renderTables(){
+  Object.entries(tables).forEach(([zone, ts])=>{
+    const el = document.getElementById(zone+'-grid');
+    if(!el) return;
+    el.innerHTML = ts.map(t=>{
+      const isSel = selTable===t.id;
+      const cls = t.occ?'table-occ':isSel?'table-sel':'table-free';
+      return `<div class="table-cell ${cls}" onclick="selectTable('${t.id}','${zone}',${t.cap},${t.occ})">
+        <span>${t.id}</span><span style="font-size:10px;font-weight:400;color:inherit">${t.cap}p</span>
+      </div>`;
+    }).join('');
+  });
+}
+
+function selectTable(id,zone,cap,occ){
+  if(occ) return;
+  selTable = id;
+  renderTables();
+  document.getElementById('table-info').classList.remove('hidden');
+  document.getElementById('ti-name').textContent = 'Mesa '+id+' · '+({terraza:'Terraza 🌿',interior:'Interior 🕯️',barra:'Barra alta 🍷'}[zone]);
+  document.getElementById('ti-cap').textContent = 'Capacidad: '+cap+' personas · Seleccionada para tu reserva';
+}
+
+function setParty(btn, size){
+  document.querySelectorAll('.party-btn').forEach(b=>{b.style.borderColor='';b.style.color='';});
+  btn.style.borderColor='#f97316'; btn.style.color='#f97316';
+  partySize = size;
+}
+
+function confirmRes(){
+  const name = document.getElementById('res-name').value;
+  if(!name){alert('Introduce tu nombre');return;}
+  document.getElementById('res-form').classList.add('hidden');
+  document.getElementById('res-confirm').classList.remove('hidden');
+  document.getElementById('c-table').textContent = selTable || 'Cualquier mesa disponible';
+  document.getElementById('c-party').textContent = partySize+' persona'+(partySize>1?'s':'');
+  document.getElementById('c-rtime').textContent = document.getElementById('res-time').value;
+  document.getElementById('c-rcode').textContent = 'TF-'+Math.floor(1000+Math.random()*9000);
+  if(selTable){const zone=Object.entries(tables).find(([z,ts])=>ts.find(t=>t.id===selTable));if(zone){const t=zone[1].find(x=>x.id===selTable);if(t)t.occ=true;} renderTables();}
+}
+function resetRes(){
+  document.getElementById('res-form').classList.remove('hidden');
+  document.getElementById('res-confirm').classList.add('hidden');
+}
+
+// Menu data
+const menuData = {
+  entrantes:[
+    {name:'Croquetas de jamón ibérico',desc:'Bechamel cremosa, rebozado crujiente. 6 uds.',price:'9€',img:'food1'},
+    {name:'Burrata con tomates cherry',desc:'Burrata fresca, cherry confitados y albahaca.',price:'13€',img:'food3'},
+    {name:'Carpaccio de ternera',desc:'Rúcula, parmesano, alcaparras y aceite de oliva.',price:'15€',img:'food2'},
+    {name:'Gazpacho de temporada',desc:'Tomate de rama, pepino y pimiento fresco.',price:'7€',img:'food3'},
+  ],
+  principales:[
+    {name:'Solomillo a la brasa',desc:'400g de solomillo, patatas y salsa de hongos.',price:'28€',img:'food2'},
+    {name:'Lubina a la sal',desc:'Lubina salvaje 600g, patata panadera y alioli.',price:'24€',img:'food1'},
+    {name:'Risotto de setas',desc:'Setas de temporada, parmesano y trufa negra.',price:'18€',img:'food3'},
+    {name:'Secreto ibérico',desc:'Cerdo ibérico, glaseado de miel y mostaza.',price:'22€',img:'food2'},
+  ],
+  postres:[
+    {name:'Tarta de queso',desc:'Queso San Simón, coulis de frutos rojos.',price:'8€',img:'food3'},
+    {name:'Coulant de chocolate',desc:'Corazón fundente, helado de vainilla.',price:'9€',img:'food1'},
+    {name:'Crema catalana',desc:'Receta tradicional con azúcar caramelizado.',price:'6€',img:'food2'},
+  ],
+  vinos:[
+    {name:'Ribera del Duero Reserva',desc:'Tempranillo 2019 · D.O. Ribera del Duero',price:'28€',img:'food1'},
+    {name:'Albariño Rias Baixas',desc:'Godello 2022 · D.O. Rías Baixas · Blanco',price:'22€',img:'food3'},
+    {name:'Rioja Gran Reserva',desc:'Tempranillo + Garnacha 2015 · D.O. Rioja',price:'38€',img:'food2'},
+    {name:'Cava Brut Nature',desc:'Macabeo + Xarelo · D.O. Cava',price:'18€',img:'food3'},
+  ],
+};
+
+let curMenuCat = 'entrantes';
+function setMenuCat(btn, cat){
+  document.querySelectorAll('.menu-cat').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  curMenuCat = cat;
+  renderMenu();
+}
+function renderMenu(){
+  const items = menuData[curMenuCat]||[];
+  document.getElementById('menu-grid').innerHTML = items.map(item=>`
+    <div class="dish-card">
+      <img src="img/${item.img}.webp" class="w-full h-44 object-cover opacity-80"/>
+      <div class="p-4">
+        <h4 class="font-bold text-sm">${item.name}</h4>
+        <p class="text-gray-500 text-xs mt-1 mb-3">${item.desc}</p>
+        <p class="font-black accent text-lg">${item.price}</p>
+      </div>
+    </div>`).join('');
+}
+
+function joinWaitlist(btn){
+  document.getElementById('my-wait-row').style.display='flex';
+  btn.textContent='✅ Apuntado. Te avisamos por WhatsApp.';
+  btn.disabled=true;
+  btn.style.background='#166534';
+}
+
+renderTables();
+renderMenu();
+// Set today's date
+document.getElementById('res-date').valueAsDate = new Date();
+</script>
+</body>
+</html>
